@@ -14,6 +14,7 @@ class PostBase(BaseModel):
 
 class ReactionBase(BaseModel):
     is_like: bool
+    post_id: int
 
 
 class UserWrite(UserBase):
@@ -26,25 +27,17 @@ class PostWrite(PostBase):
 
 class ReactionWrite(ReactionBase):
     user_id: int
-    post_id: int
-
-
-class ReactionUpdate(ReactionBase):
-    pass
 
 
 class ReactionRead(ReactionBase):
     user_id: int
-    post_id: int
     
     class Config():
         from_attributes = True
 
 
 class PostRead(PostBase):
-    created_at: str
-    id: int    
-    user_id: int
+    # created_at: int
     reactions: List[ReactionRead] = []
 
     class Config():
