@@ -1,0 +1,30 @@
+import uvicorn
+from fastapi import FastAPI
+
+from . import models
+from .database import engine
+from .routers import (
+    users,
+    auth,
+    posts,
+    reactions,
+    encode
+)
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "API is running"}
+
+app.include_router(users.router)
+app.include_router(auth.router)
+app.include_router(posts.router)
+app.include_router(reactions.router)
+app.include_router(encode.router)
+
+models.Base.metadata.create_all(engine)
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
