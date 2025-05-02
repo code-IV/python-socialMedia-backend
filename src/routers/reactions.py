@@ -12,19 +12,14 @@ router = APIRouter(
 )
 
 
-def validate_request(db: Session, reaction_id, user_id):
-    reaction = crud.get_reaction(db, reaction_id)
+def validate_request(db: Session, post_id, user_id):
+    reaction = crud.get_reaction(db, post_id, user_id)
+    print(reaction)
 
     if not reaction:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Reaction id {reaction_id} not found.'
-        )
-    
-    if reaction.user_id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail='User is not creator of the reaction.'
+            detail='Reaction not found.'
         )
     
 
@@ -34,7 +29,7 @@ def create_reaction(
     db: Session = Depends(get_db),
     current_user: schemas.UserRead = Depends(get_current_user)
 ):
-    post = crud.get_post(db, request.post_id)
+    post = crud.get_post(db=db, id=request.post_id)
 
     if post.user_id == current_user.id:
         raise HTTPException(
@@ -47,26 +42,25 @@ def create_reaction(
         post_id=request.post_id,
         user_id=current_user.id
     )
-    return crud.create_reaction(db, request)
+    return crud.create_reaction(db=db, request=request)
 
 
-@router.put('/{id}', status_code=status.HTTP_202_ACCEPTED)
+@router.put('/{post_id}', status_code=status.HTTP_202_ACCEPTED)
 def update_reaction(
-    id: int,
-    request: schemas.ReactionWrite, 
+    post_id: int,
+    request: schemas.ReactionUpdate, 
     db: Session = Depends(get_db),
     current_user: schemas.UserRead = Depends(get_current_user)
 ):
-    validate_request(db, id, current_user.id)
-    return crud.update_reaction(db, id, request,)
+    validate_request(db=db, post_id=post_id, user_id=current_user.id)
+    return crud.update_reaction(db=db, post_id=post_id, user_id=current_user.id, request=request)
 
 
-@router.delete('/{id}', status_code=status.HTTP_202_ACCEPTED)
+@router.delete('/{post_id}', status_code=status.HTTP_204_NO_CONTENT)
 def remove_reaction(
-    id: int, 
+    post_id: int, 
     db: Session = Depends(get_db),
     current_user: schemas.UserRead = Depends(get_current_user)
 ):
-    validate_request(db, id, current_user.id)
-    return crud.remove_reaction(db, id)
-
+    validate_request(db=db, post_id=post_id, user_id=current_user.id)
+    return crud.remove_reaction(db=db, user_id=current_user.id, post_id=post_id)
