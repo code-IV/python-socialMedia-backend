@@ -14,7 +14,6 @@ router = APIRouter(
 
 def validate_request(db: Session, post_id, user_id):
     reaction = crud.get_reaction(db, post_id, user_id)
-    print(reaction)
 
     if not reaction:
         raise HTTPException(
@@ -23,13 +22,14 @@ def validate_request(db: Session, post_id, user_id):
         )
     
 
-@router.post('/', status_code=status.HTTP_201_CREATED, response_model=schemas.ReactionRead)
+@router.post('/{post_id}', status_code=status.HTTP_201_CREATED, response_model=schemas.ReactionRead)
 def create_reaction(
-    request: schemas.ReactionBase, 
+    post_id: int,
+    request: schemas.ReactionUpdate, 
     db: Session = Depends(get_db),
     current_user: schemas.UserRead = Depends(get_current_user)
 ):
-    post = crud.get_post(db=db, id=request.post_id)
+    post = crud.get_post(db=db, id=post_id)
 
     if post.user_id == current_user.id:
         raise HTTPException(
@@ -39,7 +39,7 @@ def create_reaction(
     
     request = schemas.ReactionWrite(
         is_like=request.is_like,
-        post_id=request.post_id,
+        post_id=post_id,
         user_id=current_user.id
     )
     return crud.create_reaction(db=db, request=request)

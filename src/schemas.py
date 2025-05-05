@@ -14,7 +14,6 @@ class PostBase(BaseModel):
 
 class ReactionBase(BaseModel):
     is_like: bool
-    post_id: int
 
 
 class UserWrite(UserBase):
@@ -27,14 +26,16 @@ class PostWrite(PostBase):
 
 class ReactionWrite(ReactionBase):
     user_id: int
+    post_id: int
 
 
-class ReactionUpdate(BaseModel):
-    is_like: bool
+class ReactionUpdate(ReactionBase):
+    pass
 
 
 class ReactionRead(ReactionBase):
     user_id: int
+    post_id: int
     
     class Config():
         from_attributes = True
