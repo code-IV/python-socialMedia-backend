@@ -7,7 +7,8 @@ from .routers import (
     users,
     auth,
     posts,
-    reactions
+    reactions,
+    encode
 )
 
 app = FastAPI()
@@ -16,6 +17,7 @@ app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(posts.router)
 app.include_router(reactions.router)
+app.include_router(encode.router)
 
 models.Base.metadata.create_all(engine)
 
